@@ -2,6 +2,8 @@
 
 A population of evolving snakes reproducing within their environment using motile spores.
 
+[**View them evolving here**](https://trichoplax.github.io/snakes-and-spores)
+
 ---
 
 ## Arena
