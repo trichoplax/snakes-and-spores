@@ -4,13 +4,15 @@ function tasksOnLoad() {
 	let canvas = document.getElementById('arena_canvas')
 	canvas.width = 1000
 	canvas.height = 1000
-	let arena = new Arena(canvas,40)
+	let scaleInput = document.getElementById('scale_input')
+	let arena = new Arena(canvas, scaleInput, 40, 140)
 	arena.display()
 }
 
 class Arena {
-	constructor(canvas, width=10, height=0) {
+	constructor(canvas, scaleInput, width=10, height=0) {
 		this.canvas = canvas
+		this.scaleInput = scaleInput
 		this.context = canvas.getContext('2d')
 		this.width = width
 		this.height = height ? height : width
@@ -25,8 +27,20 @@ class Arena {
 			this.canvas.width / (this.minimumVisiblePath * this.ROOT3),
 			this.canvas.height / (this.minimumVisiblePath * 1.5)
 		)
-		this.maximumScale = 10
-		this.scale = 50
+		this.scaleInput.min = Math.floor(this.minimumScale)
+		this.scaleInput.max = Math.floor(this.maximumScale)
+		this.scaleInput.value = this.scaleInput.min
+		this.scale = Math.max(parseFloat(this.scaleInput.value), this.minimumScale)
+		this.scaleInput.addEventListener('change', () => {
+			if (parseFloat(this.scaleInput.value) < parseFloat(this.scaleInput.min)) {
+				this.scaleInput.value = parseFloat(this.scaleInput.min)
+			}
+			if (parseFloat(this.scaleInput.value) > parseFloat(this.scaleInput.max)) {
+				this.scaleInput.value = parseFloat(this.scaleInput.max)
+			}
+			this.scale = Math.max(parseFloat(this.scaleInput.value), this.minimumScale)
+			this.display()
+		})
 		this.arenaColors = [
 			'#FFFFFF',
 			'#F0E442',
