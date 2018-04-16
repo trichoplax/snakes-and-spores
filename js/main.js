@@ -5,14 +5,18 @@ function tasksOnLoad() {
 	canvas.width = 1000
 	canvas.height = 1000
 	let scaleInput = document.getElementById('scale_input')
-	let arena = new Arena(canvas, scaleInput, 40, 140)
+	let xViewInput = document.getElementById('x_view_input')
+	let yViewInput = document.getElementById('y_view_input')
+	let arena = new Arena(canvas, scaleInput, xViewInput, yViewInput, 40, 40)
 	arena.display()
 }
 
 class Arena {
-	constructor(canvas, scaleInput, width=10, height=0) {
+	constructor(canvas, scaleInput, xViewInput, yViewInput, width=10, height=0) {
 		this.canvas = canvas
 		this.scaleInput = scaleInput
+		this.xViewInput = xViewInput
+		this.yViewInput = yViewInput
 		this.context = canvas.getContext('2d')
 		this.width = width
 		this.height = height ? height : width
@@ -39,6 +43,34 @@ class Arena {
 				this.scaleInput.value = parseFloat(this.scaleInput.max)
 			}
 			this.scale = Math.max(parseFloat(this.scaleInput.value), this.minimumScale)
+			this.display()
+		})
+		this.xCentre = 0
+		this.yCentre = 0
+		this.xViewInput.min = -1
+		this.xViewInput.max = this.width
+		this.xViewInput.value = this.xCentre
+		this.xViewInput.addEventListener('change', () => {
+			if (parseFloat(this.xViewInput.value) < 0) {
+				this.xViewInput.value = parseFloat(this.xViewInput.value) + this.width
+			}
+			if (parseFloat(this.xViewInput.value) >= this.width) {
+				this.xViewInput.value = parseFloat(this.xViewInput.value) - this.width
+			}
+			this.xCentre = parseFloat(this.xViewInput.value)
+			this.display()
+		})
+		this.yViewInput.min = -1
+		this.yViewInput.max = this.height
+		this.yViewInput.value = this.yCentre
+		this.yViewInput.addEventListener('change', () => {
+			if (parseFloat(this.yViewInput.value) < 0) {
+				this.yViewInput.value = parseFloat(this.yViewInput.value) + this.height
+			}
+			if (parseFloat(this.yViewInput.value) >= this.height) {
+				this.yViewInput.value = parseFloat(this.yViewInput.value) - this.height
+			}
+			this.yCentre = parseFloat(this.yViewInput.value)
 			this.display()
 		})
 		this.arenaColors = [
@@ -88,8 +120,8 @@ class Arena {
 		for (let i = 0; i < this.area; i++) {
 			for (let k = 0; k < this.wrapOffsets.length; k++) {
 				let offset = this.wrapOffsets[k]
-				let u = i % this.width + offset.u
-				let v = Math.floor(i / this.width) + offset.v
+				let u = i % this.width + offset.u - this.xCentre + this.yCentre * 0.5
+				let v = Math.floor(i / this.width) + offset.v - this.yCentre
 				let x = (u + v * 0.5) * this.ROOT3 * this.scale
 				let y = v * 1.5 * this.scale
 				this.drawHexagon(x, y, this.cells[i])
